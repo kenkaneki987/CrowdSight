@@ -1,6 +1,3 @@
-// Dashboard Page Component
-// Protected route - requires authentication
-
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
@@ -12,61 +9,47 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
 
-  // Get API URL from environment variables
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
-  // Verify JWT and fetch user data on component mount
   useEffect(() => {
     verifyAuth();
   }, []);
 
-  // Verify authentication by calling /api/auth/me
   const verifyAuth = async () => {
     try {
-      // Get token from localStorage
       const token = localStorage.getItem('token');
 
-      // If no token, redirect to login
       if (!token) {
         router.push('/login');
         return;
       }
 
-      // Verify token with backend
       const response = await axios.get(`${API_URL}/api/auth/me`, {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
 
-      // Set user data if valid
       setUser(response.data.user);
       setIsLoading(false);
 
     } catch (err) {
       console.error('Auth verification error:', err);
-      // Clear invalid token
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      // Redirect to login
       router.push('/login');
     }
   };
 
-  // Handle logout
   const handleLogout = () => {
-    // Clear localStorage
     localStorage.removeItem('token');
     localStorage.removeItem('user');
-    // Redirect to home page
     router.push('/');
   };
 
-  // Show loading state while verifying
   if (isLoading) {
     return (
       <div className="min-h-screen bg-black flex items-center justify-center">
-        {/* Animated Background */}
         <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(76,29,149,0.1),transparent_50%)]"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.1),transparent_50%)]"></div>
@@ -86,7 +69,6 @@ export default function Dashboard() {
     );
   }
 
-  // Main dashboard UI
   return (
     <>
       <Head>
@@ -94,24 +76,20 @@ export default function Dashboard() {
       </Head>
 
       <div className="min-h-screen bg-black text-white">
-        {/* Animated Background */}
         <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(76,29,149,0.1),transparent_50%)]"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.1),transparent_50%)]"></div>
         </div>
         
-        {/* Navigation Bar */}
         <nav className="relative z-50 backdrop-blur-md bg-black/20 border-b border-white/10">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-20">
-              {/* Logo */}
               <div className="flex items-center">
                 <span className="text-3xl font-black tracking-tight text-white">
                   CrowdSight
                 </span>
               </div>
 
-              {/* User Menu */}
               <div className="flex items-center space-x-6">
                 <span className="text-gray-300">
                   Welcome, <span className="font-semibold text-white">{user?.name}</span>
@@ -127,9 +105,7 @@ export default function Dashboard() {
           </div>
         </nav>
 
-        {/* Dashboard Content */}
         <main className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          {/* Welcome Section */}
           <div className="mb-8 animate-fade-in">
             <h1 className="text-4xl lg:text-5xl font-black text-white mb-2">
               <span className="bg-gradient-to-r from-white via-gray-300 to-gray-500 bg-clip-text text-transparent">
@@ -141,7 +117,6 @@ export default function Dashboard() {
             </p>
           </div>
 
-          {/* User Info Card */}
           <div className="card mb-8 animate-slide-up">
             <h2 className="text-2xl font-bold text-white mb-6 flex items-center">
               <svg className="w-6 h-6 mr-3 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -175,9 +150,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Stats Grid */}
           <div className="grid md:grid-cols-3 gap-8 mb-8">
-            {/* Stat Card 1 - Cameras */}
             <div className="group card bg-gradient-to-br from-blue-600/20 to-blue-800/20 border-blue-500/30 animate-slide-up hover:from-blue-600/30 hover:to-blue-800/30 transition-all duration-500">
               <div className="flex items-center justify-between">
                 <div>
@@ -201,7 +174,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Stat Card 2 - People */}
             <div className="group card bg-gradient-to-br from-green-600/20 to-green-800/20 border-green-500/30 animate-slide-up hover:from-green-600/30 hover:to-green-800/30 transition-all duration-500" style={{animationDelay: '0.1s'}}>
               <div className="flex items-center justify-between">
                 <div>
@@ -225,7 +197,6 @@ export default function Dashboard() {
               </div>
             </div>
 
-            {/* Stat Card 3 - Alerts */}
             <div className="group card bg-gradient-to-br from-purple-600/20 to-purple-800/20 border-purple-500/30 animate-slide-up hover:from-purple-600/30 hover:to-purple-800/30 transition-all duration-500" style={{animationDelay: '0.2s'}}>
               <div className="flex items-center justify-between">
                 <div>
@@ -250,7 +221,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Features */}
           <div className="glass-card animate-slide-up" style={{animationDelay: '0.3s'}}>
             <h2 className="text-xl font-bold text-white mb-4 bg-gradient-to-r from-blue-400 to-purple-400 bg-clip-text text-transparent">
               Features
@@ -323,7 +293,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Coming Soon Notice */}
           <div className="mt-8 glass-card text-center animate-slide-up group hover:scale-105 transition-all duration-500" style={{animationDelay: '0.4s'}}>
             <div className="flex items-center justify-center mb-4">
               <div className="p-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-500 mr-3 group-hover:scale-110 transition-transform duration-300 animate-float">

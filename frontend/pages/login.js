@@ -1,6 +1,3 @@
-// Login Page Component
-// User authentication form
-
 import { useState } from 'react';
 import { useRouter } from 'next/router';
 import { useForm } from 'react-hook-form';
@@ -12,37 +9,30 @@ export default function Login() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Initialize react-hook-form
   const {
     register,
     handleSubmit,
     formState: { errors }
   } = useForm();
 
-  // Get API URL from environment variables
   const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
 
-  // Handle form submission
   const onSubmit = async (data) => {
     try {
       setError('');
       setIsLoading(true);
 
-      // Make API request to login endpoint
       const response = await axios.post(`${API_URL}/api/auth/login`, {
         email: data.email,
         password: data.password
       });
 
-      // Store JWT token in localStorage
       localStorage.setItem('token', response.data.token);
       localStorage.setItem('user', JSON.stringify(response.data.user));
 
-      // Redirect to dashboard on success
       router.push('/dashboard');
 
     } catch (err) {
-      // Handle errors
       console.error('Login error:', err);
       setError(
         err.response?.data?.error || 
@@ -60,14 +50,12 @@ export default function Login() {
       </Head>
 
       <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        {/* Animated Background */}
         <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(76,29,149,0.1),transparent_50%)]"></div>
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.1),transparent_50%)]"></div>
         </div>
         
         <div className="max-w-md w-full space-y-8 animate-fade-in relative z-10">
-          {/* Logo and Header */}
           <div className="text-center">
             <h1 
               className="text-4xl font-bold text-white cursor-pointer hover:text-gray-300 transition-colors duration-300"
@@ -83,17 +71,14 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Login Form */}
           <div className="card">
             <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-              {/* Error Message */}
               {error && (
                 <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg animate-slide-up backdrop-blur-md">
                   {error}
                 </div>
               )}
 
-              {/* Email Field */}
               <div>
                 <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                   Email Address
@@ -116,7 +101,6 @@ export default function Login() {
                 )}
               </div>
 
-              {/* Password Field */}
               <div>
                 <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
                   Password
@@ -139,7 +123,6 @@ export default function Login() {
                 )}
               </div>
 
-              {/* Remember Me & Forgot Password */}
               <div className="flex items-center justify-between">
                 <div className="flex items-center">
                   <input
@@ -160,7 +143,6 @@ export default function Login() {
                 </div>
               </div>
 
-              {/* Submit Button */}
               <button
                 type="submit"
                 disabled={isLoading}
@@ -179,7 +161,6 @@ export default function Login() {
                 )}
               </button>
 
-              {/* Signup Link */}
               <div className="text-center">
                 <p className="text-sm text-gray-400">
                   Don't have an account?{' '}
@@ -195,7 +176,6 @@ export default function Login() {
             </form>
           </div>
 
-          {/* Back to Home */}
           <div className="text-center">
             <button
               onClick={() => router.push('/')}

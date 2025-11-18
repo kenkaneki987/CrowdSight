@@ -6,8 +6,8 @@ A full-stack application built with Next.js, Node.js/Express, and PostgreSQL (Ne
 
 ## 🌐 Live Demo
 
-- **Frontend (Vercel):** [Add your Vercel URL here after deployment]
-- **Backend (Render):** [Add your Render URL here after deployment]
+- **Frontend (Vercel):** https://crowd-sight.vercel.app/
+- **Backend (Render):** https://crowdsight-zc3b.onrender.com
 - **Database:** Neon PostgreSQL (Production)
 
 ## 📋 Project Proposal

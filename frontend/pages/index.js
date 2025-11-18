@@ -1,6 +1,3 @@
-// Landing Page Component - Modern Apple-Inspired Design
-// Main entry point with hero section and features
-
 import { useRouter } from 'next/router';
 import Head from 'next/head';
 import { useState, useEffect } from 'react';
@@ -13,7 +10,6 @@ export default function Home() {
     setIsLoaded(true);
   }, []);
 
-  // Enhanced feature data with modern icons
   const features = [
     {
       title: 'Real-Time Analysis',

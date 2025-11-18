@@ -1,6 +1,3 @@
-// Next.js App Component
-// Wraps all pages with global styles
-
 import '../styles/globals.css'
 
 export default function App({ Component, pageProps }) {
