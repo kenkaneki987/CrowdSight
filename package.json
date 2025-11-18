@@ -1,0 +1,33 @@
+{
+  "name": "crowdsight",
+  "version": "1.0.0",
+  "description": "CrowdSight - Real-Time Crowd Density & Safety Monitoring System",
+  "scripts": {
+    "install:backend": "cd backend && npm install",
+    "install:frontend": "cd frontend && npm install",
+    "install:all": "npm run install:backend && npm run install:frontend",
+    "dev:backend": "cd backend && npm run dev",
+    "dev:frontend": "cd frontend && npm run dev",
+    "setup": "npm run install:all && echo '\n✅ Dependencies installed! Configure .env files and run: npm run dev'",
+    "prisma:generate": "cd backend && npx prisma generate",
+    "prisma:push": "cd backend && npx prisma db push",
+    "prisma:studio": "cd backend && npx prisma studio",
+    "build:backend": "cd backend && npm install",
+    "build:frontend": "cd frontend && npm run build",
+    "build:all": "npm run build:backend && npm run build:frontend"
+  },
+  "keywords": [
+    "crowdsight",
+    "crowd-monitoring",
+    "nextjs",
+    "express",
+    "prisma",
+    "jwt-authentication"
+  ],
+  "author": "",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/crowdsight.git"
+  }
+}
