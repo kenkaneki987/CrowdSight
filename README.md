@@ -2,7 +2,54 @@
 
 **AI-powered Crowd Monitoring Made Simple**
 
-A full-stack application built with Next.js, Node.js/Express, and MySQL (PlanetScale) with Prisma ORM for real-time crowd density monitoring and safety analysis.
+A full-stack application built with Next.js, Node.js/Express, and PostgreSQL (Neon) with Prisma ORM for real-time crowd density monitoring and safety analysis.
+
+## 🌐 Live Demo
+
+- **Frontend (Vercel):** [Add your Vercel URL here after deployment]
+- **Backend (Render):** [Add your Render URL here after deployment]
+- **Database:** Neon PostgreSQL (Production)
+
+## 📋 Project Proposal
+
+### Problem Statement
+Managing crowd density and safety in public spaces, events, and venues is a critical challenge. Traditional manual monitoring is inefficient, error-prone, and unable to provide real-time insights. There's a need for an intelligent system that can monitor, analyze, and alert authorities about crowd conditions in real-time.
+
+### Solution
+CrowdSight is a comprehensive full-stack web application that provides:
+- **Secure User Management:** JWT-based authentication system with bcrypt password hashing for secure access control
+- **Real-time Monitoring Dashboard:** Protected dashboard interface for authorized personnel to monitor crowd analytics
+- **Scalable Architecture:** Built with modern technologies (Next.js, Express, PostgreSQL) ensuring scalability and performance
+- **RESTful API Backend:** Clean, documented API endpoints for future integration with IoT devices, cameras, and ML models
+
+### Target Users
+- Event management companies
+- Public venue administrators
+- Security personnel and law enforcement
+- Smart city authorities
+- Large retail spaces and malls
+
+### Key Features
+1. **User Authentication System:** Secure signup/login with JWT tokens
+2. **Protected Dashboard:** Role-based access to monitoring interface
+3. **Responsive Design:** Works seamlessly across devices (desktop, tablet, mobile)
+4. **Cloud-Based Infrastructure:** Fully deployed on modern cloud platforms (Vercel, Render, Neon)
+5. **Production-Ready:** Complete with error handling, validation, and security best practices
+
+### Technology Stack Rationale
+- **Next.js:** Server-side rendering and optimal performance
+- **Express.js:** Fast, minimalist backend framework
+- **PostgreSQL:** Reliable, ACID-compliant database for critical data
+- **Prisma ORM:** Type-safe database access and migrations
+- **JWT:** Industry-standard authentication
+- **TailwindCSS:** Rapid UI development with modern design
+
+### Future Enhancements
+- Integration with CCTV cameras for real-time video analysis
+- ML-based crowd density prediction
+- SMS/Email alert system for emergency situations
+- Heat map visualization of crowd distribution
+- Historical data analytics and reporting
 
 ## 🚀 Features
 
@@ -50,7 +97,7 @@ CrowdSight/
 - **Node.js** - JavaScript runtime
 - **Express** - Web framework
 - **Prisma ORM** - Database toolkit
-- **MySQL** (PlanetScale) - Database
+- **PostgreSQL** (Neon) - Production database
 - **bcrypt** - Password hashing
 - **jsonwebtoken** - JWT authentication
 - **CORS** - Cross-origin resource sharing
@@ -66,7 +113,7 @@ CrowdSight/
 
 ### Prerequisites
 - Node.js 18+ and npm
-- PlanetScale account (or any MySQL database)
+- Neon PostgreSQL account (or any PostgreSQL database)
 - Git
 
 ### Backend Setup
@@ -88,10 +135,11 @@ CrowdSight/
 
 4. **Configure environment variables in `.env`:**
    ```env
-   DATABASE_URL="mysql://username:password@aws.connect.psdb.cloud/crowdsight?sslaccept=strict"
+   DATABASE_URL="postgresql://username:password@host/database?sslmode=require"
    JWT_SECRET="your-super-secret-jwt-key-change-this"
-   PORT=5000
+   PORT=5001
    NODE_ENV=development
+   FRONTEND_URL="http://localhost:3000"
    ```
 
 5. **Generate Prisma client:**
@@ -99,7 +147,7 @@ CrowdSight/
    npx prisma generate
    ```
 
-6. **Push database schema to PlanetScale:**
+6. **Push database schema to PostgreSQL:**
    ```bash
    npx prisma db push
    ```
@@ -108,7 +156,7 @@ CrowdSight/
    ```bash
    npm run dev
    ```
-   Server will run on `http://localhost:5000`
+   Server will run on `http://localhost:5001`
 
 ### Frontend Setup
 
@@ -129,7 +177,7 @@ CrowdSight/
 
 4. **Configure environment variables in `.env.local`:**
    ```env
-   NEXT_PUBLIC_API_URL=http://localhost:5000
+   NEXT_PUBLIC_API_URL=http://localhost:5001
    ```
 
 5. **Start the development server:**
@@ -152,7 +200,7 @@ CrowdSight/
 
 **Signup:**
 ```bash
-curl -X POST http://localhost:5000/api/auth/signup \
+curl -X POST http://localhost:5001/api/auth/signup \
   -H "Content-Type: application/json" \
   -d '{
     "name": "John Doe",
@@ -163,7 +211,7 @@ curl -X POST http://localhost:5000/api/auth/signup \
 
 **Login:**
 ```bash
-curl -X POST http://localhost:5000/api/auth/login \
+curl -X POST http://localhost:5001/api/auth/login \
   -H "Content-Type: application/json" \
   -d '{
     "email": "john@example.com",
@@ -173,7 +221,7 @@ curl -X POST http://localhost:5000/api/auth/login \
 
 **Get User:**
 ```bash
-curl http://localhost:5000/api/auth/me \
+curl http://localhost:5001/api/auth/me \
   -H "Authorization: Bearer YOUR_JWT_TOKEN"
 ```
 
@@ -190,43 +238,44 @@ curl http://localhost:5000/api/auth/me \
 
 3. **Configure environment variables:**
    ```
-   NEXT_PUBLIC_API_URL=https://your-backend-url.railway.app
+   NEXT_PUBLIC_API_URL=https://your-backend-url.onrender.com
    ```
 
 4. **Deploy!**
 
-### Backend (Railway)
+### Backend (Render)
 
 1. **Push code to GitHub**
 
-2. **Create new project in Railway:**
-   - Go to [railway.app](https://railway.app)
-   - Create new project from GitHub repo
-   - Select `backend` as root directory
+2. **Create new Web Service in Render:**
+   - Go to [render.com](https://render.com)
+   - Create new Web Service from GitHub repo
+   - Set root directory to `backend`
 
 3. **Configure environment variables:**
    ```
-   DATABASE_URL=your-planetscale-connection-string
+   DATABASE_URL=your-neon-postgresql-connection-string
    JWT_SECRET=your-secret-key
-   PORT=5000
+   PORT=5001
    NODE_ENV=production
+   FRONTEND_URL=https://your-frontend-url.vercel.app
    ```
 
-4. **Add build command:**
+4. **Set build command:**
    ```
    npm install && npx prisma generate
    ```
 
-5. **Add start command:**
+5. **Set start command:**
    ```
    npm start
    ```
 
-### Database (PlanetScale)
+### Database (Neon PostgreSQL)
 
 1. **Create database:**
-   - Go to [planetscale.com](https://planetscale.com)
-   - Create new database named `crowdsight`
+   - Go to [neon.tech](https://neon.tech)
+   - Create new project named `crowdsight`
    - Get connection string
 
 2. **Apply schema:**
@@ -252,7 +301,7 @@ curl http://localhost:5000/api/auth/me \
 
 ## 🧪 Testing the Application
 
-1. **Start both servers** (backend on :5000, frontend on :3000)
+1. **Start both servers** (backend on :5001, frontend on :3000)
 
 2. **Visit** `http://localhost:3000`
 
@@ -262,13 +311,21 @@ curl http://localhost:5000/api/auth/me \
 
 5. **Access dashboard** to see protected content
 
+6. **Verify JWT Token:**
+   - Open browser DevTools → Application → Local Storage
+   - Copy the `token` value
+   - Go to [jwt.io](https://jwt.io)
+   - Paste token to verify payload
+
 ## 📝 Development Notes
 
 - Backend uses CommonJS (`require`/`module.exports`)
 - Frontend uses ES6 modules (`import`/`export`)
-- Prisma uses `relationMode = "prisma"` for PlanetScale compatibility
-- JWT tokens stored in `localStorage` (consider `httpOnly` cookies for production)
+- Prisma schema configured for PostgreSQL
+- JWT tokens stored in `localStorage` with 7-day expiration
+- Passwords hashed with bcrypt (10 salt rounds)
 - Forms use `react-hook-form` for validation
+- CORS configured to allow production frontend URL
 
 ## 🤝 Contributing
 
