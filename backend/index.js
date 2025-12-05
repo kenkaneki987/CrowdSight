@@ -95,6 +95,33 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Health check endpoint for debugging deployment
+app.get('/health', async (req, res) => {
+  try {
+    // Test database connection
+    await prisma.$connect();
+    const userCount = await prisma.user.count();
+    await prisma.$disconnect();
+    
+    res.json({
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      environment: process.env.NODE_ENV,
+      database: 'connected',
+      userCount: userCount,
+      version: '1.0.0'
+    });
+  } catch (error) {
+    console.error('Health check failed:', error);
+    res.status(500).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: error.message,
+      environment: process.env.NODE_ENV
+    });
+  }
+});
+
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/reports', reportRoutes);
