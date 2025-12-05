@@ -44,17 +44,24 @@ const signup = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        role: true, // Include role in response
         createdAt: true
       }
     });
 
+    // Create JWT token with user ID, email, and role
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { 
+        userId: user.id, 
+        email: user.email, 
+        role: user.role 
+      },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.status(201).json({
+      success: true,
       message: 'User created successfully',
       user,
       token
@@ -77,7 +84,15 @@ const login = async (req, res) => {
     }
 
     const user = await prisma.user.findUnique({
-      where: { email }
+      where: { email },
+      select: {
+        id: true,
+        name: true,
+        email: true,
+        password: true,
+        role: true, // Include role for JWT
+        createdAt: true
+      }
     });
 
     if (!user) {
@@ -90,18 +105,25 @@ const login = async (req, res) => {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
 
+    // Create JWT token with user ID, email, and role
     const token = jwt.sign(
-      { userId: user.id, email: user.email },
+      { 
+        userId: user.id, 
+        email: user.email, 
+        role: user.role 
+      },
       process.env.JWT_SECRET,
       { expiresIn: '7d' }
     );
 
     res.json({
+      success: true,
       message: 'Login successful',
       user: {
         id: user.id,
         name: user.name,
         email: user.email,
+        role: user.role, // Include role in response
         createdAt: user.createdAt
       },
       token
@@ -123,6 +145,7 @@ const getMe = async (req, res) => {
         id: true,
         name: true,
         email: true,
+        role: true, // Include role in response
         createdAt: true
       }
     });
@@ -142,6 +165,7 @@ const getMe = async (req, res) => {
 };
 
 module.exports = {
+  register: signup, // Export signup as register for compatibility
   signup,
   login,
   getMe

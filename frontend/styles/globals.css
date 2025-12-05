@@ -1,24 +1,65 @@
-/* Global styles for CrowdSight application - Modern Dark Theme */
-/* Note: @tailwind and @apply directives are processed by Tailwind CSS */
+/* Global styles for CrowdSight application - Cyberpunk Theme */
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* Cyberpunk Animations */
+@keyframes grid-move {
+  0% {
+    transform: translateY(0) translateX(0);
+  }
+  100% {
+    transform: translateY(50px) translateX(50px);
+  }
+}
+
+@keyframes neon-pulse {
+  0%, 100% {
+    opacity: 1;
+    filter: drop-shadow(0 0 10px rgba(255, 0, 255, 0.8));
+  }
+  50% {
+    opacity: 0.8;
+    filter: drop-shadow(0 0 20px rgba(255, 0, 255, 1));
+  }
+}
+
+@keyframes glitch {
+  0% {
+    transform: translate(0);
+  }
+  20% {
+    transform: translate(-2px, 2px);
+  }
+  40% {
+    transform: translate(-2px, -2px);
+  }
+  60% {
+    transform: translate(2px, 2px);
+  }
+  80% {
+    transform: translate(2px, -2px);
+  }
+  100% {
+    transform: translate(0);
+  }
+}
+
 /* Custom base styles */
 @layer base {
   html {
     @apply scroll-smooth;
     scroll-behavior: smooth;
-    scroll-padding-top: 80px; /* Account for fixed nav */
+    scroll-padding-top: 80px;
   }
   
   body {
     @apply bg-black text-white font-inter antialiased;
-    background: linear-gradient(135deg, #000000 0%, #1a1a1a 100%);
+    background: #000000;
     min-height: 100vh;
-    overflow-x: hidden; /* Prevent horizontal scroll */
+    overflow-x: hidden;
   }
 
   * {
@@ -362,4 +403,18 @@
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.3);
+}
+
+/* Custom gradient utilities */
+.bg-gradient-radial {
+  background: radial-gradient(circle, var(--tw-gradient-stops));
+}
+
+/* Line clamp utility for text truncation */
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
 }

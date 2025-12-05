@@ -1,188 +1,255 @@
 import { useState } from 'react';
 import { useRouter } from 'next/router';
-import { useForm } from 'react-hook-form';
-import axios from 'axios';
 import Head from 'next/head';
 
 export default function Login() {
   const router = useRouter();
-  const [error, setError] = useState('');
+  const [isLogin, setIsLogin] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    email: '',
+    password: '',
+    name: '',
+    confirmPassword: ''
+  });
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors }
-  } = useForm();
+  const [errors, setErrors] = useState({});
 
-  const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+    
+    if (errors[name]) {
+      setErrors(prev => ({
+        ...prev,
+        [name]: ''
+      }));
+    }
+  };
 
-  const onSubmit = async (data) => {
+  const validateForm = () => {
+    const newErrors = {};
+
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = 'Please enter a valid email';
+    }
+
+    if (!formData.password.trim()) {
+      newErrors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+
+    if (!isLogin) {
+      if (!formData.name.trim()) {
+        newErrors.name = 'Name is required';
+      }
+      if (formData.password !== formData.confirmPassword) {
+        newErrors.confirmPassword = 'Passwords do not match';
+      }
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (!validateForm()) return;
+
+    setIsLoading(true);
+
     try {
-      setError('');
-      setIsLoading(true);
+      const endpoint = isLogin ? '/api/auth/login' : '/api/auth/signup';
+      const body = isLogin 
+        ? { email: formData.email, password: formData.password }
+        : { name: formData.name, email: formData.email, password: formData.password };
 
-      const response = await axios.post(`${API_URL}/api/auth/login`, {
-        email: data.email,
-        password: data.password
+      const response = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
       });
 
-      localStorage.setItem('token', response.data.token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      const data = await response.json();
+      console.log('Login response:', data);
 
-      router.push('/dashboard');
-
-    } catch (err) {
-      console.error('Login error:', err);
-      setError(
-        err.response?.data?.error || 
-        'Failed to login. Please check your credentials.'
-      );
+      if (data.success) {
+        console.log('Login successful, storing token and redirecting...');
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        console.log('Token stored, about to redirect...');
+        
+        // Redirect based on user role
+        if (data.user.role === 'admin') {
+          router.push('/admin');
+        } else {
+          router.push('/dashboard');
+        }
+      } else {
+        setErrors({ submit: data.message });
+      }
+    } catch (error) {
+      setErrors({ submit: 'Something went wrong. Please try again.' });
     } finally {
       setIsLoading(false);
     }
   };
 
+  const toggleMode = () => {
+    setIsLogin(!isLogin);
+    setFormData({
+      email: '',
+      password: '',
+      name: '',
+      confirmPassword: ''
+    });
+    setErrors({});
+  };
+
   return (
     <>
       <Head>
-        <title>Login - CrowdSight</title>
+        <title>{isLogin ? 'Login' : 'Sign Up'} - CrowdSight</title>
       </Head>
 
-      <div className="min-h-screen bg-black flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
+      <div className="min-h-screen bg-black text-white overflow-hidden">
         <div className="fixed inset-0 bg-gradient-to-br from-black via-gray-900 to-black">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(76,29,149,0.1),transparent_50%)]"></div>
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_20%,rgba(59,130,246,0.1),transparent_50%)]"></div>
+          <div className="absolute inset-0 bg-gradient-radial from-purple-900/20 via-transparent to-transparent"></div>
         </div>
-        
-        <div className="max-w-md w-full space-y-8 animate-fade-in relative z-10">
-          <div className="text-center">
-            <h1 
-              className="text-4xl font-bold text-white cursor-pointer hover:text-gray-300 transition-colors duration-300"
-              onClick={() => router.push('/')}
-            >
-              CrowdSight
-            </h1>
-            <h2 className="mt-6 text-3xl font-extrabold text-white">
-              Welcome back
-            </h2>
-            <p className="mt-2 text-sm text-gray-400">
-              Sign in to your account to continue
-            </p>
-          </div>
 
-          <div className="card">
-            <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
-              {error && (
-                <div className="bg-red-500/10 border border-red-500/30 text-red-400 px-4 py-3 rounded-lg animate-slide-up backdrop-blur-md">
-                  {error}
-                </div>
-              )}
+        <div className="relative z-10 flex items-center justify-center min-h-screen px-4 py-8">
+          <div className="w-full max-w-md">
+            <div className="text-center mb-8">
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-blue-500 bg-clip-text text-transparent">
+                CrowdSight
+              </h1>
+              <h2 className="text-2xl md:text-3xl font-semibold mb-2 text-white">
+                {isLogin ? 'Welcome Back' : 'Create Account'}
+              </h2>
+              <p className="text-gray-400 text-lg">
+                {isLogin ? 'Monitor crowds with intelligent analytics' : 'Join CrowdSight for crowd monitoring'}
+              </p>
+            </div>
 
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
-                  Email Address
-                </label>
-                <input
-                  id="email"
-                  type="email"
-                  className={`input-field ${errors.email ? 'input-error' : ''}`}
-                  placeholder="john@example.com"
-                  {...register('email', {
-                    required: 'Email is required',
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: 'Invalid email address'
-                    }
-                  })}
-                />
-                {errors.email && (
-                  <p className="mt-1 text-sm text-red-400">{errors.email.message}</p>
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-700 p-6">
+              <form onSubmit={handleSubmit} className="space-y-5">
+                {!isLogin && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      name="name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="Enter your full name"
+                    />
+                    {errors.name && (
+                      <p className="mt-2 text-sm text-red-400">
+                        {errors.name}
+                      </p>
+                    )}
+                  </div>
                 )}
-              </div>
 
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-white mb-2">
-                  Password
-                </label>
-                <input
-                  id="password"
-                  type="password"
-                  className={`input-field ${errors.password ? 'input-error' : ''}`}
-                  placeholder="••••••••"
-                  {...register('password', {
-                    required: 'Password is required',
-                    minLength: {
-                      value: 6,
-                      message: 'Password must be at least 6 characters'
-                    }
-                  })}
-                />
-                {errors.password && (
-                  <p className="mt-1 text-sm text-red-400">{errors.password.message}</p>
-                )}
-              </div>
-
-              <div className="flex items-center justify-between">
-                <div className="flex items-center">
-                  <input
-                    id="remember-me"
-                    name="remember-me"
-                    type="checkbox"
-                    className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-600 rounded bg-gray-700"
-                  />
-                  <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-300">
-                    Remember me
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Email Address
                   </label>
+                  <input
+                    type="email"
+                    name="email"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    placeholder="Enter your email"
+                  />
+                  {errors.email && (
+                    <p className="mt-2 text-sm text-red-400">
+                      {errors.email}
+                    </p>
+                  )}
                 </div>
 
-                <div className="text-sm">
-                  <a href="#" className="font-medium text-blue-400 hover:text-blue-300 transition-colors duration-300">
-                    Forgot password?
-                  </a>
+                <div>
+                  <label className="block text-sm font-medium text-gray-300 mb-2">
+                    Password
+                  </label>
+                  <input
+                    type="password"
+                    name="password"
+                    value={formData.password}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    placeholder="Enter your password"
+                  />
+                  {errors.password && (
+                    <p className="mt-2 text-sm text-red-400">
+                      {errors.password}
+                    </p>
+                  )}
                 </div>
-              </div>
 
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full btn-primary"
-              >
-                {isLoading ? (
-                  <span className="flex items-center justify-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Signing in...
-                  </span>
-                ) : (
-                  'Sign In'
+                {!isLogin && (
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">
+                      Confirm Password
+                    </label>
+                    <input
+                      type="password"
+                      name="confirmPassword"
+                      value={formData.confirmPassword}
+                      onChange={handleInputChange}
+                      className="w-full px-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                      placeholder="Confirm your password"
+                    />
+                    {errors.confirmPassword && (
+                      <p className="mt-2 text-sm text-red-400">
+                        {errors.confirmPassword}
+                      </p>
+                    )}
+                  </div>
                 )}
-              </button>
 
-              <div className="text-center">
-                <p className="text-sm text-gray-400">
-                  Don't have an account?{' '}
+                {errors.submit && (
+                  <div className="p-4 bg-red-900/50 border border-red-700 rounded-lg">
+                    <p className="text-red-300 text-sm">{errors.submit}</p>
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  disabled={isLoading}
+                  className={`w-full py-3 px-6 rounded-lg font-semibold transition-colors ${
+                    isLoading
+                      ? 'bg-gray-600 cursor-not-allowed text-gray-300'
+                      : 'bg-blue-600 hover:bg-blue-700 text-white'
+                  }`}
+                >
+                  {isLoading ? 'Please wait...' : (isLogin ? 'Sign In' : 'Create Account')}
+                </button>
+
+                <div className="text-center">
                   <button
                     type="button"
-                    onClick={() => router.push('/signup')}
-                    className="font-medium text-blue-400 hover:text-blue-300 transition-colors duration-300"
+                    onClick={toggleMode}
+                    className="text-blue-400 hover:text-blue-300 transition-colors text-sm"
                   >
-                    Sign up here
+                    {isLogin ? "Don't have an account? Sign up" : 'Already have an account? Sign in'}
                   </button>
-                </p>
-              </div>
-            </form>
-          </div>
-
-          <div className="text-center">
-            <button
-              onClick={() => router.push('/')}
-              className="text-sm text-gray-400 hover:text-gray-300 transition-colors duration-300"
-            >
-              ← Back to home
-            </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>

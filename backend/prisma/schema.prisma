@@ -12,12 +12,33 @@ datasource db {
 
 // User model for authentication
 model User {
-  id        String   @id @default(cuid())
+  id        Int      @id @default(autoincrement())
   name      String
   email     String   @unique
   password  String   // Will store bcrypt hashed password
+  role      String   @default("user") // user or admin
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
+  // Relationship to reports
+  reports   Report[]
+
   @@map("users") // Table name in database
+}
+
+// Report model for crowd monitoring submissions
+model Report {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String
+  imageUrl    String?   // Stores base64 data URLs (data:image/jpeg;base64,...)
+  location    String
+  crowdLevel  String    // "Low", "Medium", "High"
+  crowdCount  Int?      // optional user-input number
+  status      String   @default("Pending")
+  createdAt   DateTime @default(now())
+  user        User?    @relation(fields: [userId], references: [id])
+  userId      Int?
+
+  @@map("reports") // Table name in database
 }
