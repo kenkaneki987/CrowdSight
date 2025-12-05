@@ -12,18 +12,34 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
   'http://localhost:3000',
   'http://localhost:3001',
-  'http://localhost:3002'
+  'http://localhost:3002',
+  // Vercel deployment patterns
+  'https://crowd-sight-eacmsi6fo-kush-puris-projects.vercel.app',
+  'https://crowdsight-kenkaneki987.vercel.app',
+  /\.vercel\.app$/,
+  // Allow any subdomain of vercel.app for this project
+  /^https:\/\/crowd-sight-.*\.vercel\.app$/,
+  /^https:\/\/crowdsight-.*\.vercel\.app$/
 ].filter(Boolean);
 
 const corsOptions = {
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
     
+    // Check string origins
     if (allowedOrigins.indexOf(origin) !== -1) {
-      callback(null, true);
-    } else {
-      callback(new Error('Not allowed by CORS'));
+      return callback(null, true);
     }
+    
+    // Check regex patterns
+    for (const pattern of allowedOrigins) {
+      if (pattern instanceof RegExp && pattern.test(origin)) {
+        return callback(null, true);
+      }
+    }
+    
+    console.log(`❌ CORS rejected origin: ${origin}`);
+    callback(new Error('Not allowed by CORS'));
   },
   credentials: true,
   optionsSuccessStatus: 200
