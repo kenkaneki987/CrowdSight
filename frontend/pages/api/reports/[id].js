@@ -1,7 +1,7 @@
 // Frontend API proxy for individual report operations
 export default async function handler(req, res) {
   try {
-    const backendUrl = process.env.BACKEND_URL || 'http://localhost:5001';
+    const backendUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5001';
     const { method, body, query } = req;
     const { id } = query; // Get the report ID from the route
     
